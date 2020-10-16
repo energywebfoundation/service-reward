@@ -63,7 +63,7 @@ describe('Payout', function () {
     expect((await this.payout.members(user3)).toString()).to.be.equal('0')
   })
 
-  describe.only('Pay and Pull rewards', function () {
+  describe('Pay and Pull rewards', function () {
     beforeEach(async function () {
       this.payout = await Payout.new({from: owner})
       this.block = await web3.eth.getBlock('latest')
