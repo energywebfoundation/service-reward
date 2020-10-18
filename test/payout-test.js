@@ -88,7 +88,7 @@ describe('Payout', function () {
       expect(rewardAmount.toString()).to.equal('333333333333333333')
     })
 
-    it('existing members can pull their reward', async function () {
+    it('existing members can pull their reward only once', async function () {
       const user1Balance = bn(await web3.eth.getBalance(user1))
       const user2Balance = bn(await web3.eth.getBalance(user2))
       const user3Balance = bn(await web3.eth.getBalance(user3))
@@ -96,16 +96,19 @@ describe('Payout', function () {
         const {receipt} = await this.payout.pullReward(this.payoutPeriod, {from: user1})
         expect((await web3.eth.getBalance(user1)).toString()).to
             .equal(user1Balance.sub(this.gasPrice.mul(bn(receipt.gasUsed))).add(bn('333333333333333333')).toString())
+        help.expectRevert(this.payout.pullReward(this.payoutPeriod, {from: user1}), "one address can not pull the reward multiple times")
       }
       {
         const {receipt} = await this.payout.pullReward(this.payoutPeriod, {from: user2})
         expect((await web3.eth.getBalance(user2)).toString()).to
             .equal(user2Balance.sub(this.gasPrice.mul(bn(receipt.gasUsed))).add(bn('333333333333333333')).toString())
+        help.expectRevert(this.payout.pullReward(this.payoutPeriod, {from: user2}), "one address can not pull the reward multiple times")
       }
       {
         const {receipt} = await this.payout.pullReward(this.payoutPeriod, {from: user3})
         expect((await web3.eth.getBalance(user3)).toString()).to
             .equal(user3Balance.sub(this.gasPrice.mul(bn(receipt.gasUsed))).add(bn('333333333333333333')).toString())
+        help.expectRevert(this.payout.pullReward(this.payoutPeriod, {from: user3}), "one address can not pull the reward multiple times")
       }
 
     })

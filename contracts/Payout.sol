@@ -11,6 +11,7 @@ contract Payout {
     struct Reward {
         uint memberCount;
         uint rewardAmount;
+        mapping(address => bool) payouts;
     }
 
     address public owner;
@@ -64,10 +65,12 @@ contract Payout {
     }
 
     function pullReward(uint periodTimestamp) public {
+        require(!rewards[periodTimestamp].payouts[msg.sender], "one address can not pull the reward multiple times");
         require(members[msg.sender] <= periodTimestamp, "the sender is not eligible for this reward");
         require(rewards[periodTimestamp].rewardAmount > 0, "there is no reward for this period");
 
         msg.sender.transfer(rewards[periodTimestamp].rewardAmount);
+        rewards[periodTimestamp].payouts[msg.sender] = true;
     }
 
 }
