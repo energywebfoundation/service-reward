@@ -1,17 +1,17 @@
 # Service Reward
 
 The decentralized services of the EW-DOS utility layer are paid for through a reward pool concept. This means that 
-users pay a fixed fee for accessing the service for a access period and all the fees are pooled together in a 
+users, or authorized delegated parties (e.g. companies, application developers) pay a fixed fee for accessing a given utility layer service for a pre-defined access period and all the fees are pooled together in a 
 smart contract. At the end of the access period, the pool is paid out to the service providers.
 
 The reward pool is the payment contract from the [Utility of the utility token for utilities](https://medium.com/energy-web-insights/the-utility-of-the-utility-token-for-utilities-69c9be603a59)
 blog post. As explained in the post:
 
->1. Companies deposit EWT into a payment contract to gain access to Utility Layer services for a specified number of DIDs over a pre-determined length of time (e.g., one year) called the access period.
+>1. Companies deposit EWT into a payment contract to gain access to Utility Layer services for a specified number of DIDs, or individual users deposit EWT into a payment contract directly, over a pre-determined length of time (e.g., one year) called the access period.
 >1. Based on the EWT balance deposited, the payment contract issues one ERC-20 service token for each DID. The service token exists solely to track usage of the Utility Layer services throughout the access period.
->1. Customers (end-users) create DIDs by using the company’s application. Whenever a customer creates a DID, the payment contract initiates the access period by activating one service token.
->1. Over the course of the access period, the payment contract automatically 1) burns a portion of each DID’s service token and 2) releases a portion of the corresponding EWT balance to the Utility Layer nodes incrementally. In this way, the ERC-20 service token and the EWT balance are both exhausted at the end of the payment term (e.g., one year).
->1. This process is repeated to extend or renew Utility Layer access for DIDs.
+>1. Customers (end-users) create DIDs by using the company’s application (if the end-user does not already have a DID). Whenever a customer creates a DID, the payment contract initiates the access period by activating one service token that is associated with that DID.
+>1. Over the course of the access period, the payment contract automatically 1) burns a portion of each DID’s service token and 2) releases a portion of the corresponding EWT balance from the service reward contract to the Utility Layer nodes incrementally. In this way, the ERC-20 service token and the EWT balance in the service reward contract are both exhausted at the end of the access period (e.g., one year).
+>1. This process is repeated to extend or renew access to Utility Layer services for DIDs.
 
 ## Reward Pool Creation (Constructor)
 
@@ -40,18 +40,18 @@ interface PriceOracleI {
 }
 ```
 
-The `getCurrentValue` function is expected to return the number of tokens it takes to purchase one unit of fiat currency
+The `getCurrentValue` function is expected to return the number of EWT it takes to purchase one unit of fiat currency
 (e.g. USD or EUR)
 
 ### Payout Address
 
 At the end of each period, when the `closePeriod` function is called, the reward tokens for this period are transferred 
-to a specialised smart-contract which contains the logic for the distribution of the reward to the service node 
+to a specialised payment smart-contract which contains the logic for the distribution of the reward to the service node 
 operators.
 
 ## Registering a user
 
-Users can self register or get their registration performed by somone else. No special permission is required for the 
+Users can self register or get their registration performed by somone else via delegation. No special permission is required for the 
 first registration. Once the registration has happened, only the same address can extend or renew the registration.
 
 The `register` function has following signature
@@ -67,7 +67,7 @@ actually not mandated by the contract logic
 * `multiplier` is the increase or decrease for the price of this registration and should be used to account for the 
 energy intensity of the asset being registered 
 
-The EWT sent in the function call will be used to register the user for as many full access periods as possible. 
+The EWT sent in the function call will be used to register the user for as many full access periods as possible based on the current price. 
 If some EWT remains after the registration, they will be returned to the sender. It might be tricky to compute exactly 
 how many tokens to send as the price is computed per second on a changing token price. Therefore it makes sense to 
 simply return whatever change is left over.
@@ -130,7 +130,7 @@ calling the `register` function with at least enough EWT to pay for one addition
 When the subscription is extended 4 things happen:
 
 1. the `deliveryPeriods[registrants[registrant].expiry].registrantCount` is increased by one to reflect the fact that
-the registrant will not leave at this moment in time after all
+the registrant will not leave at the originally defined time after all
 1. the `registrants[registrant].expiry` attribute is updated to the new timestamp 
 1. with this new `expiry` timestamp the attribute in `deliveryPeriods[registrants[registrant].expiry].registrantCount` 
 is decreased by 1 to account for the fact that the registrant will leave at this time
