@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "oz compile && mocha --exit --recursive test",
+    "cuke": "cucumber-js",
     "build": "oz compile"
   },
   "repository": {
@@ -18,12 +19,15 @@
   },
   "homepage": "https://github.com/energywebfoundation/service-reward#readme",
   "devDependencies": {
+    "@cucumber/cucumber": "^7.0.0-rc.0",
     "@openzeppelin/cli": "^2.8.2",
     "@openzeppelin/contracts": "^3.2.0",
     "@openzeppelin/test-environment": "^0.1.5",
     "@openzeppelin/test-helpers": "^0.5.6",
     "@truffle/expect": "0.0.15",
     "@truffle/hdwallet-provider": "^1.1.0",
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^8.0.3",
     "chai": "^4.2.0",
     "ganache-cli": "^6.11.0",
     "mocha": "^8.1.3",
